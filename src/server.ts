@@ -5,39 +5,52 @@ import fs from "node:fs";
 import path from "path";
 import { fileURLToPath, pathToFileURL } from "url";
 
-// Needed to construct __dirname in ESM
+// ESM-compatible __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 8000;
 const app = express();
 
-// Middlewares
+// ✅ Debug: Log incoming origins (optional, can be removed in prod)
+app.use((req, res, next) => {
+  console.log("🔍 Incoming origin:", req.headers.origin);
+  next();
+});
+
+// ✅ Updated CORS setup
 const allowedOrigins = [
-  "https://auth-api-v1-tau.vercel.app", // prod
-  "http://localhost:3000", // dev
-  "http://localhost:3001", // dev
-  "https://your-frontend.vercel.app", // alt prod
+  "https://auth-api-v1-tau.vercel.app",
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "https://your-frontend.vercel.app",
 ];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin) return callback(null, true); // Allow requests with no origin (e.g., curl or server-side)
+      if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error("Not allowed by CORS"));
+        callback(new Error("❌ Not allowed by CORS"));
       }
     },
     credentials: true,
-    methods: ["GET", "POST", "PATCH", "DELETE"],
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"], // ✅ Added OPTIONS
+    allowedHeaders: ["Content-Type", "Authorization"], // ✅ Explicit headers
   })
 );
+
+// ✅ Preflight handler
+app.options("*", cors());
+
+// Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Load route files
+// Route Loader
 const loadRoutes = async () => {
   const routesPath = path.join(__dirname, "routes");
   const routeFiles = fs
@@ -58,7 +71,7 @@ const loadRoutes = async () => {
   );
 };
 
-// Start server after loading routes
+// Server Starter
 const startServer = async () => {
   await loadRoutes();
 
