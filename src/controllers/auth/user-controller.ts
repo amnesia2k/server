@@ -64,7 +64,7 @@ export const registerUser = async (req: Request, res: Response) => {
       path: "/",
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      sameSite: true,
+      sameSite: "none",
       // secure: true,
       secure: process.env.NODE_ENV === "production",
     });
@@ -73,7 +73,7 @@ export const registerUser = async (req: Request, res: Response) => {
       path: "/",
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      sameSite: true,
+      sameSite: "none",
       // secure: true,
       secure: process.env.NODE_ENV === "production",
     });
@@ -130,7 +130,7 @@ export const loginUser = async (req: Request, res: Response) => {
       path: "/",
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      sameSite: true,
+      sameSite: "none",
       // secure: true,
       secure: process.env.NODE_ENV === "production",
     });
@@ -139,7 +139,7 @@ export const loginUser = async (req: Request, res: Response) => {
       path: "/",
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      sameSite: true,
+      sameSite: "none",
       // secure: true,
       secure: process.env.NODE_ENV === "production",
     });
